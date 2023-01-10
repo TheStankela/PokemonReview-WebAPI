@@ -32,7 +32,7 @@ namespace WebApiTest1.Repository
             return ((decimal)review.Sum(r => r.Rating) / review.Count());
         }
 
-        public IEnumerable<Pokemon> GetPokemons()
+        public ICollection<Pokemon> GetPokemons()
         {
             return _dataContext.POkemons.OrderBy(p => p.Id).ToList();
         }

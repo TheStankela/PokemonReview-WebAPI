@@ -15,6 +15,12 @@ namespace WebApiTest1.Repository
         {
             _dataContext = dataContext;
         }
+
+        public bool CountryExists(int countryId)
+        {
+            return _dataContext.Countries.Any(c => c.Id == countryId);
+        }
+
         public IEnumerable<Country> GetCountries()
         {
             return _dataContext.Countries.ToList();

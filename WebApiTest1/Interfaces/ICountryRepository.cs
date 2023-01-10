@@ -9,5 +9,6 @@ namespace WebApiTest1.Interfaces
         public ICollection<Owner> GetOwnersByCountry(int countryId);
 
         public Country GetCountryByOwnerID(int ownerId);
+        public bool CountryExists(int countryId);
     }
 }
