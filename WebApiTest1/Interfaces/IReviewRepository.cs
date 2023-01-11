@@ -9,5 +9,7 @@ namespace WebApiTest1.Interfaces
         public Reviewer GetReviewerByReview(int reviewId);
         public Pokemon GetPokemonByReview(int reviewId);
         public bool ReviewExists(int id);
+        public bool CreateReview(Review review);
+        public bool Save();
     }
 }

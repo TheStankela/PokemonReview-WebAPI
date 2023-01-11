@@ -38,27 +38,55 @@ namespace WebApiTest1.Controllers
             return Ok(category);
         }
 
-        [HttpGet ("pokefilter/{pokeId}")]
+        [HttpGet ("GetPokemonsCategory/{pokeId}")]
         [ProducesResponseType(200, Type = typeof(Category))]
         public IActionResult GetCategoryByPokemon(int pokeId)
         {
             if (!_pokemonRepository.PokemonExists(pokeId))
                 return NotFound();
 
-            var category = _mapper.Map<List<CategoryDto>>(_categoryRepository.GetCategoryByPokemon(pokeId));
+            var category = _mapper.Map<CategoryDto>(_categoryRepository.GetCategoryByPokemon(pokeId));
 
             return Ok(category);
         }
-        [HttpGet("catfilter/{categoryId}")]
+        [HttpGet("GetPokemonByCategoryID/{categoryId}")]
         [ProducesResponseType(200, Type = typeof(Pokemon))]
         public IActionResult GetPokemonByCategory(int categoryId)
         {
             if (!_categoryRepository.CategoryExists(categoryId))
                 return NotFound();
 
-            var pokemon = _mapper.Map<List<PokemonDto>>(_categoryRepository.GetPokemonsByCategory(categoryId));
+            var pokemon = _mapper.Map<PokemonDto>(_categoryRepository.GetPokemonsByCategory(categoryId));
 
             return Ok(pokemon);
+        }
+
+        [HttpPost]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        public IActionResult CreateCategory([FromBody] CategoryDto categoryCreate)
+        {
+            if (categoryCreate == null)
+                return BadRequest(ModelState);
+
+            var category = _categoryRepository.GetCategories()
+                .Where(c => c.Name.Trim().ToUpper() == categoryCreate.Name.TrimEnd().ToUpper()).FirstOrDefault();
+
+            if (category != null)
+            {
+                ModelState.AddModelError("", "Category already exists");
+                return StatusCode(422, ModelState);
+            }
+
+            var categoryMap = _mapper.Map<Category>(categoryCreate);
+            if (!_categoryRepository.CreateCategory(categoryMap))
+            {
+                ModelState.AddModelError("", "Something went wrong while saving.");
+                return StatusCode(500, ModelState);
+            }
+
+
+            return StatusCode(200, "Successfully created.");
         }
 
 

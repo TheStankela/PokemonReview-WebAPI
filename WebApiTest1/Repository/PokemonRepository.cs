@@ -13,6 +13,32 @@ namespace WebApiTest1.Repository
             _dataContext = dataContext;
         }
 
+        public bool CreatePokemon(Pokemon pokemon, int categoryId, int ownerId)
+        {
+            var pokemonOwnerEntity = _dataContext.Owners.Where(o => o.Id == ownerId).FirstOrDefault();
+            var category = _dataContext.Categories.Where(c => c.Id == categoryId).FirstOrDefault();
+
+            var pokemonOwner = new PokemonOwner()
+            {
+                Owner = pokemonOwnerEntity,
+                Pokemon = pokemon
+            };
+
+            _dataContext.Add(pokemonOwner);
+
+            var pokemonCategory = new PokemonCategory()
+            {
+                Category = category,
+                Pokemon = pokemon
+            };
+
+            _dataContext.Add(pokemonCategory);
+
+            _dataContext.Add(pokemon);
+
+            return Save();
+        }
+
         public Pokemon GetPokemon(int id)
         {
             return _dataContext.POkemons.Where(p => p.Id == id).FirstOrDefault();
@@ -41,6 +67,11 @@ namespace WebApiTest1.Repository
         {
             return _dataContext.POkemons.Any(p => p.Id == id);
         }
-       
+
+        public bool Save()
+        {
+            var saved = _dataContext.SaveChanges();
+            return saved > 0 ? true : false;
+        }
     }
 }

@@ -37,5 +37,17 @@ namespace WebApiTest1.Repository
         {
             return _dataContext.Reviews.Any(r => r.Id == id);
         }
+
+        public bool CreateReview(Review review)
+        {
+            _dataContext.Add(review);
+            return Save();
+        }
+
+        public bool Save()
+        {
+            var saved = _dataContext.SaveChanges();
+            return saved > 0 ? true : false;
+        }
     }
 }

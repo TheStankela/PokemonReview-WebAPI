@@ -18,6 +18,12 @@ namespace WebApiTest1.Repository
             return _dataContext.Categories.Any(c => c.Id == id);
         }
 
+        public bool CreateCategory(Category category)
+        {
+            _dataContext.Add(category);
+            return Save();
+        }
+
         public ICollection<Category> GetCategories()
         {
             return _dataContext.Categories.ToList();
@@ -36,6 +42,12 @@ namespace WebApiTest1.Repository
         public ICollection<Pokemon> GetPokemonsByCategory(int id)
         {
             return _dataContext.PokemonCategories.Where(p => p.CategoryId == id).Select(p => p.Pokemon).ToList();
+        }
+
+        public bool Save()
+        {
+            var saved = _dataContext.SaveChanges();
+            return saved > 0 ? true : false;
         }
     }
 }

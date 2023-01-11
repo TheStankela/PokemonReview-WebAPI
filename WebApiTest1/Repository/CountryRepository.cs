@@ -21,6 +21,12 @@ namespace WebApiTest1.Repository
             return _dataContext.Countries.Any(c => c.Id == countryId);
         }
 
+        public bool CreateCountry(Country country)
+        {
+            _dataContext.Add(country);
+            return Save();
+        }
+
         public IEnumerable<Country> GetCountries()
         {
             return _dataContext.Countries.ToList();
@@ -40,7 +46,10 @@ namespace WebApiTest1.Repository
             return _dataContext.Owners.Where(c => c.Country.Id == countryId).ToList();
         }
 
-
-
+        public bool Save()
+        {
+            var saved = _dataContext.SaveChanges();
+            return saved > 0 ? true : false;
+        }
     }
 }

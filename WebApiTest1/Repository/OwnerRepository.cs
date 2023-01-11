@@ -13,6 +13,13 @@ namespace WebApiTest1.Repository
         {
             _dataContext = dataContext;
         }
+
+        public bool CreateOwner(Owner owner)
+        {
+            _dataContext.Add(owner);
+            return Save();
+        }
+
         public ICollection<Owner> GetOwners()
         {
             return _dataContext.Owners.ToList();
@@ -31,6 +38,12 @@ namespace WebApiTest1.Repository
         public bool OwnerExists(int id)
         {
             return _dataContext.Owners.Any(o => o.Id == id);
+        }
+
+        public bool Save()
+        {
+            var saved = _dataContext.SaveChanges();
+            return saved > 0 ? true : false;
         }
     }
 }

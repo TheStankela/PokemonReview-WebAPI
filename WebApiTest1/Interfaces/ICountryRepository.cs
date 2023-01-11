@@ -10,5 +10,7 @@ namespace WebApiTest1.Interfaces
 
         public Country GetCountryByOwnerID(int ownerId);
         public bool CountryExists(int countryId);
+        public bool CreateCountry (Country country);
+        public bool Save();
     }
 }

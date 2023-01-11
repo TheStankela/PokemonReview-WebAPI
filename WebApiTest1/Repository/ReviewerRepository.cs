@@ -12,6 +12,13 @@ namespace WebApiTest1.Repository
         {
             _dataContext = dataContext;
         }
+
+        public bool CreateReviewer(Reviewer reviewer)
+        {
+            _dataContext.Add(reviewer);
+            return Save();
+        }
+
         public Reviewer GetReviewer(int id)
         {
             return _dataContext.Reviewers.Where(r => r.Id == id).FirstOrDefault();
@@ -30,6 +37,12 @@ namespace WebApiTest1.Repository
         public bool ReviewerExists(int id)
         {
            return _dataContext.Reviewers.Any(r => r.Id == id);
+        }
+
+        public bool Save()
+        {
+            var saved = _dataContext.SaveChanges();
+            return saved > 0 ? true : false;
         }
     }
 }

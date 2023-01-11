@@ -9,5 +9,7 @@ namespace WebApiTest1.Interfaces
 
         public ICollection<Review> GetReviewsOfReviewer(int reviewerId);
         public bool ReviewerExists(int id);
+        public bool CreateReviewer(Reviewer reviewer);
+        public bool Save();
     }
 }

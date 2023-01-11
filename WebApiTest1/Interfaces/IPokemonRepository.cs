@@ -10,5 +10,7 @@ namespace WebApiTest1.Interfaces
         public Pokemon GetPokemon(string name);
         public decimal GetPokemonRating(int id);
         bool PokemonExists(int id);
+        bool CreatePokemon(Pokemon pokemon, int categoryId, int ownerId);
+        bool Save();
     }
 }

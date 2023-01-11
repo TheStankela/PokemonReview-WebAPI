@@ -8,5 +8,8 @@ namespace WebApiTest1.Interfaces
         public Owner GetOwners(int id);
         public List<Pokemon> GetPokemonsByOwner(int ownerId);
         public bool OwnerExists(int id);
+
+        public bool CreateOwner(Owner owner);
+        public bool Save();
     }
 }

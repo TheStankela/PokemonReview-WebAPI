@@ -13,11 +13,15 @@ namespace WebApiTest1.Controllers
     {
         private readonly IMapper _mapper;
         private readonly IReviewRepository _reviewRepository;
+        private readonly IPokemonRepository _pokemonRepository;
+        private readonly IReviewerRepository _reviewerRepository;
 
-        public ReviewController(IMapper mapper, IReviewRepository reviewRepository)
+        public ReviewController(IMapper mapper, IReviewRepository reviewRepository, IPokemonRepository pokemonRepository, IReviewerRepository reviewerRepository)
         {
             _mapper = mapper;
             _reviewRepository = reviewRepository;
+            _pokemonRepository = pokemonRepository;
+            _reviewerRepository = reviewerRepository;
         }
 
         [HttpGet]
@@ -47,7 +51,7 @@ namespace WebApiTest1.Controllers
             return Ok(review);
         }
 
-        [HttpGet ("PokemonByReview/{reviewId}")]
+        [HttpGet ("GetPokemonByReviewID/{reviewId}")]
         [ProducesResponseType(200, Type = typeof(Pokemon))]
         public IActionResult GetPokemonByReview(int reviewId) 
         { 
@@ -63,7 +67,7 @@ namespace WebApiTest1.Controllers
 
         }
 
-        [HttpGet ("RevewerByReview/{reviewId}")]
+        [HttpGet ("GetRevewerByReviewID/{reviewId}")]
         [ProducesResponseType(200, Type = typeof(Reviewer))]
         public IActionResult GetReviewerByReview(int reviewId)
         {
@@ -76,6 +80,35 @@ namespace WebApiTest1.Controllers
                 return BadRequest(ModelState);
 
             return Ok(reviewer);
+        }
+        [HttpPost]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        public IActionResult CreateReview([FromBody] ReviewDto reviewCreate, [FromQuery] int pokemonId, [FromQuery] int reviewerId)
+        {
+            if (reviewCreate == null)
+                return BadRequest();
+
+            var review = _reviewRepository.GetReviews()
+                .Where(r => r.Title.Trim().ToUpper() == reviewCreate.Title.Trim().ToUpper()).SingleOrDefault();
+            
+            if (review != null)
+            {
+                ModelState.AddModelError("", "Review already exists.");
+                return StatusCode(422, ModelState);
+            }
+
+            var reviewMap = _mapper.Map<Review>(reviewCreate);
+            reviewMap.Pokemon = _pokemonRepository.GetPokemon(pokemonId);
+            reviewMap.Reviewer = _reviewerRepository.GetReviewer(reviewerId);
+
+            if (!_reviewRepository.CreateReview(reviewMap))
+            {
+                ModelState.AddModelError("", "Something went wrong while saving.");
+                return StatusCode(500, ModelState);
+            }
+
+            return StatusCode(200, "Review successfully created.");
         }
     }
 }

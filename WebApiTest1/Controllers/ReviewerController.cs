@@ -46,7 +46,7 @@ namespace WebApiTest1.Controllers
 
             return Ok(reviewer);
         }
-        [HttpGet ("ReviewsOfReviewer/{reviewerId}")]
+        [HttpGet ("GetReviewsOfReviewer/{reviewerId}")]
         [ProducesResponseType(200, Type = typeof(IEnumerable<Review>))]
         public IActionResult GetReviewsOfReviewer(int reviewerId)
         {
@@ -60,6 +60,34 @@ namespace WebApiTest1.Controllers
 
             return Ok(reviews);
 
+        }
+
+        [HttpPost]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        public IActionResult CreateReviewer([FromBody] ReviewerDto reviewerCreate)
+        {
+            if (reviewerCreate == null)
+                return BadRequest();
+
+            var reviewer = _reviewerRepository.GetReviewers()
+                .Where(r => r.LastName.Trim().ToUpper() == reviewerCreate.LastName.TrimEnd().ToUpper()).FirstOrDefault();
+
+            if(reviewer != null)
+            {
+                ModelState.AddModelError("", "Reviewer already exists.");
+                return StatusCode(422, ModelState);
+            }
+
+            var reviewerMap = _mapper.Map<Reviewer>(reviewerCreate);
+            
+            if (!_reviewerRepository.CreateReviewer(reviewerMap))
+            {
+                ModelState.AddModelError("", "Something went wrong while saving.");
+                return StatusCode(500, ModelState);
+            }
+
+            return StatusCode(200, "Reviewer successfully created.");
         }
     }
 }

@@ -15,11 +15,13 @@ namespace WebApiTest1.Controllers
     {
         private readonly IOwnerRepository _ownerRepository;
         private readonly IMapper _mapper;
+        private readonly ICountryRepository _countryRepository;
 
-        public OwnerController(IOwnerRepository ownerRepository, IMapper mapper)
+        public OwnerController(IOwnerRepository ownerRepository, IMapper mapper, ICountryRepository countryRepository)
         {
             _ownerRepository = ownerRepository;
             _mapper = mapper;
+            _countryRepository = countryRepository;
         }
 
         [HttpGet]
@@ -48,7 +50,7 @@ namespace WebApiTest1.Controllers
 
             return Ok(owner);
         }
-        [HttpGet ("PokemonByOwner/{ownerId}")]
+        [HttpGet ("GetPokemonByOwnerID/{ownerId}")]
         [ProducesResponseType(200, Type = typeof(IEnumerable<Pokemon>))]
         public IActionResult GetPokemonsByOwner(int ownerId) 
         {
@@ -62,6 +64,34 @@ namespace WebApiTest1.Controllers
 
             return Ok(pokemons);
         }
-        
+        [HttpPost]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        public IActionResult CreateOwner([FromBody] OwnerDto ownerCreate, [FromQuery] int countryId)
+        {
+            if (ownerCreate == null)
+                return BadRequest();
+
+            var owner = _ownerRepository.GetOwners()
+                .Where(o => o.LastName.Trim().ToUpper() == ownerCreate.LastName.Trim().ToUpper()).FirstOrDefault();
+            
+            if(owner != null)
+            {
+                ModelState.AddModelError("", "Owner already exists.");
+                return StatusCode(422, ModelState);
+            }
+
+            
+            var ownerMap = _mapper.Map<Owner>(ownerCreate);
+            ownerMap.Country = _countryRepository.GetCountry(countryId);
+            
+
+            if (!_ownerRepository.CreateOwner(ownerMap))
+            {
+                ModelState.AddModelError("","Something went wrong while saving.");
+                return StatusCode(500, ModelState);
+            }
+            return StatusCode(200, "Owner successfully created.");
+        }
     }
 }
