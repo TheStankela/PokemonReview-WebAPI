@@ -19,6 +19,12 @@ namespace WebApiTest1.Repository
             return Save();
         }
 
+        public bool DeleteReviewer(Reviewer reviewer)
+        {
+            _dataContext.Remove(reviewer);
+            return Save();
+        }
+
         public Reviewer GetReviewer(int id)
         {
             return _dataContext.Reviewers.Where(r => r.Id == id).FirstOrDefault();
@@ -43,6 +49,12 @@ namespace WebApiTest1.Repository
         {
             var saved = _dataContext.SaveChanges();
             return saved > 0 ? true : false;
+        }
+
+        public bool UpdateReviewer(Reviewer reviewer)
+        {
+            _dataContext.Update(reviewer);
+            return Save();
         }
     }
 }

@@ -49,5 +49,17 @@ namespace WebApiTest1.Repository
             var saved = _dataContext.SaveChanges();
             return saved > 0 ? true : false;
         }
+
+        public bool DeleteReview(Review review)
+        {
+            _dataContext.Remove(review);
+            return Save();
+        }
+
+        public bool UpdateReview(Review review)
+        {
+            _dataContext.Update(review);
+            return Save();
+        }
     }
 }

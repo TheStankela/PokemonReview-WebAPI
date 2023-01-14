@@ -20,6 +20,12 @@ namespace WebApiTest1.Repository
             return Save();
         }
 
+        public bool DeleteOwner(Owner owner)
+        {
+            _dataContext.Remove(owner);
+            return Save();
+        }
+
         public ICollection<Owner> GetOwners()
         {
             return _dataContext.Owners.ToList();
@@ -44,6 +50,12 @@ namespace WebApiTest1.Repository
         {
             var saved = _dataContext.SaveChanges();
             return saved > 0 ? true : false;
+        }
+
+        public bool UpdateOwner(Owner owner)
+        {
+            _dataContext.Update(owner);
+            return Save();
         }
     }
 }

@@ -89,5 +89,55 @@ namespace WebApiTest1.Controllers
 
             return StatusCode(200, "Reviewer successfully created.");
         }
+
+        [HttpPut ("{reviewerId}")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        public IActionResult UpdateReviewer([FromBody] ReviewerDto updatedReviewer, int reviewerId) 
+        {
+            if(updatedReviewer == null)
+                return BadRequest(ModelState);
+            if(updatedReviewer.Id != reviewerId)
+                return BadRequest();
+            if (_reviewerRepository.ReviewerExists(reviewerId))
+                return NotFound("Reviewer does not exist.");
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var reviewerMap = _mapper.Map<Reviewer>(updatedReviewer);
+
+            if(!_reviewerRepository.UpdateReviewer(reviewerMap))
+            {
+                ModelState.AddModelError("", "Error while updating the reviewer.");
+                return StatusCode(500, ModelState);
+            }
+
+            return StatusCode(200, "Successfully updated the reviewer.");
+        }
+
+        [HttpDelete ("{reviewerId}")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        public IActionResult DeleteReviewer (int reviewerId)
+        {
+            if (reviewerId == 0)
+                return BadRequest(ModelState);
+            if (!_reviewerRepository.ReviewerExists(reviewerId))
+                return NotFound("Reviewer does not exist.");
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var reviewerToDelete = _reviewerRepository.GetReviewer(reviewerId);
+
+            if (!_reviewerRepository.DeleteReviewer(reviewerToDelete))
+            {
+                ModelState.AddModelError("", "Error while deleting reviewer.");
+                return StatusCode(500, ModelState);
+            }
+
+            return StatusCode(200, "Successfully deleted the reviewer.");
+        }
     }
 }

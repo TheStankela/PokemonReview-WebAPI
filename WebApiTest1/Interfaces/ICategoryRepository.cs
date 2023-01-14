@@ -11,6 +11,9 @@ namespace WebApiTest1.Interfaces
         public ICollection<Pokemon> GetPokemonsByCategory(int id);
         public bool CategoryExists (int id);
         public bool CreateCategory(Category category);
+        public bool UpdateCategory(Category category);
+        public bool DeleteCategory(Category category);
         public bool Save();
+        
     }
 }

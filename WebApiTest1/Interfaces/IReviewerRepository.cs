@@ -11,5 +11,8 @@ namespace WebApiTest1.Interfaces
         public bool ReviewerExists(int id);
         public bool CreateReviewer(Reviewer reviewer);
         public bool Save();
+
+        public bool DeleteReviewer(Reviewer reviewer);
+        public bool UpdateReviewer(Reviewer reviewer);
     }
 }

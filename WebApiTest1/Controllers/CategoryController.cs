@@ -49,14 +49,14 @@ namespace WebApiTest1.Controllers
 
             return Ok(category);
         }
-        [HttpGet("GetPokemonByCategoryID/{categoryId}")]
-        [ProducesResponseType(200, Type = typeof(Pokemon))]
+        [HttpGet("GetPokemonsByCategoryID/{categoryId}")]
+        [ProducesResponseType(200, Type = typeof(IEnumerable<Pokemon>))]
         public IActionResult GetPokemonByCategory(int categoryId)
         {
             if (!_categoryRepository.CategoryExists(categoryId))
                 return NotFound();
 
-            var pokemon = _mapper.Map<PokemonDto>(_categoryRepository.GetPokemonsByCategory(categoryId));
+            var pokemon = _mapper.Map<List<PokemonDto>>(_categoryRepository.GetPokemonsByCategory(categoryId));
 
             return Ok(pokemon);
         }
@@ -87,6 +87,59 @@ namespace WebApiTest1.Controllers
 
 
             return StatusCode(200, "Successfully created.");
+        }
+
+        [HttpPut("{catId}")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(400)]
+        public IActionResult UpdateCategory([FromBody]CategoryDto updatedCategory, int catId ) {
+
+            if (updatedCategory == null)
+                return BadRequest();
+
+            if (!_categoryRepository.CategoryExists(catId))
+                return NotFound("Category does not exist.");
+
+            if (updatedCategory.Id != catId)
+                return BadRequest();
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var categoryMap = _mapper.Map<Category>(updatedCategory);
+
+            if (!_categoryRepository.UpdateCategory(categoryMap))
+            {
+                ModelState.AddModelError("", "Error occured while updating the category.");
+                return StatusCode(500, ModelState);
+            }
+
+            return StatusCode(200, "Category updated successfully.");
+        
+        }
+
+        [HttpDelete ("{categoryId}")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(400)]
+        public IActionResult DeleteCategory(int categoryId)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var categoryToDelete = _categoryRepository.GetCategory(categoryId);
+
+            if (!_categoryRepository.CategoryExists(categoryId))
+                return NotFound("Category does not exist.");
+
+            if (!_categoryRepository.DeleteCategory(categoryToDelete))
+            {
+                ModelState.AddModelError("", "Error while deleting category.");
+                return StatusCode(500, ModelState);
+            }
+
+            return StatusCode(200, "Category deleted successfully.");
         }
 
 

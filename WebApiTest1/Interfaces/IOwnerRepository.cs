@@ -11,5 +11,7 @@ namespace WebApiTest1.Interfaces
 
         public bool CreateOwner(Owner owner);
         public bool Save();
+        public bool DeleteOwner(Owner owner);
+        public bool UpdateOwner(Owner owner);
     }
 }

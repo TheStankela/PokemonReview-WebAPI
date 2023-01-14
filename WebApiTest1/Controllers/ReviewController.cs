@@ -110,5 +110,54 @@ namespace WebApiTest1.Controllers
 
             return StatusCode(200, "Review successfully created.");
         }
+        [HttpPut ("{reviewId}")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        public IActionResult UpdateReview (int reviewId, [FromBody] ReviewDto review)
+        {
+            if (reviewId != review.Id)
+                return BadRequest(ModelState);
+
+            if (!_reviewRepository.ReviewExists(reviewId))
+                return NotFound("Review does not exist.");
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var reviewMap = _mapper.Map<Review>(review);
+
+            if (!_reviewRepository.UpdateReview(reviewMap))
+            {
+                ModelState.AddModelError("", "Error while updating the review.");
+                return StatusCode(500, ModelState);
+            }
+
+            return StatusCode(200, "Successfully updated the review.");
+
+            
+        }
+        [HttpPut("{reviewId}")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        public IActionResult DeleteReview(int reviewId)
+        {
+            if (!_reviewRepository.ReviewExists(reviewId))
+                return NotFound("Review does not exist.");
+
+            if (!ModelState.IsValid)
+                return BadRequest();
+
+            var reviewToDelete = _reviewRepository.GetReview(reviewId);
+
+            if (!_reviewRepository.DeleteReview(reviewToDelete))
+            {
+                ModelState.AddModelError("", "Error while updating the review.");
+                return StatusCode(500, ModelState);
+            }
+
+            return StatusCode(200, "Successfully deleted the review.");
+        }
     }
 }

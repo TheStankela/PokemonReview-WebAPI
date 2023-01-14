@@ -93,5 +93,55 @@ namespace WebApiTest1.Controllers
             }
             return StatusCode(200, "Owner successfully created.");
         }
+
+        [HttpPut ("{ownerId}")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        public IActionResult UpdateOwner([FromBody] OwnerDto updatedOwner, int ownerId)
+        {
+            if (updatedOwner == null)
+                return BadRequest(ModelState);
+            if (updatedOwner.Id != ownerId)
+                return BadRequest();
+            if (!_ownerRepository.OwnerExists(ownerId))
+                return NotFound("Owner not found.");
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var ownerMap = _mapper.Map<Owner>(updatedOwner);
+
+            if (!_ownerRepository.UpdateOwner(ownerMap))
+            {
+                ModelState.AddModelError("", "Error while updating the owner.");
+                return StatusCode(500, ModelState);
+            }
+
+            return StatusCode(200, "Successfully updated the owner.");
+
+        }
+
+        [HttpDelete ("{ownerId}")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        public IActionResult DeleteOwner(int ownerId)
+        {
+            
+            if (_ownerRepository.OwnerExists(ownerId))
+                return NotFound("Owner does not exist.");
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var ownerToDelete = _ownerRepository.GetOwners(ownerId);
+
+            if (!_ownerRepository.DeleteOwner(ownerToDelete))
+            {
+                ModelState.AddModelError("", "Something went wrong while deleting the owner.");
+                return StatusCode(500, ModelState);
+            }
+
+            return StatusCode(200, "Owner deleted successfully.");
+        }
     }
 }

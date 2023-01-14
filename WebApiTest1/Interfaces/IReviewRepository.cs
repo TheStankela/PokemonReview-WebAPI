@@ -11,5 +11,7 @@ namespace WebApiTest1.Interfaces
         public bool ReviewExists(int id);
         public bool CreateReview(Review review);
         public bool Save();
+        public bool DeleteReview(Review review);
+        public bool UpdateReview(Review review);
     }
 }
